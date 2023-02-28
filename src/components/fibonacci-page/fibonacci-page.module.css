@@ -1,0 +1,25 @@
+.input-container {
+  max-width: 522px;
+  margin: 0 auto;
+  display: flex;
+  gap: 12px;
+}
+
+.circles-list {
+  max-width: 960px;
+  padding: 0;
+  margin: 120px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  list-style: none;
+}
+
+.fibonacci-index {
+  margin: 8px 0 0;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--text-color-input);
+}
