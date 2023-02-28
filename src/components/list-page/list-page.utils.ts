@@ -10,15 +10,15 @@ class Node<T> {
 }
 
 type TLinkedList<T> = {
-  appendAtHead: (item: T) => void;
-  appendAtTail: (item: T) => void;
-  insertAt: (item: T, index: number) => void;
-  removeFromHead: () => void;
-  removeFromTail: () => void;
-  removeFrom: (index: number) => void;
+  prepend: (item: T) => void;
+  append: (item: T) => void;
+  addByIndex: (item: T, index: number) => void;
+  deleteHead: () => void;
+  deleteTail: () => void;
+  deleteByIndex: (index: number) => void;
   getSize: () => number;
-  transformListToArr: () => T[];
-  getArr: () => { value: T; state: ElementStates }[];
+  toArray: () => T[];
+  getArray: () => { value: T; state: ElementStates }[];
 };
 
 export class LinkedList<T> implements TLinkedList<T> {
@@ -29,7 +29,7 @@ export class LinkedList<T> implements TLinkedList<T> {
     this.size = 0;
   }
 
-  appendAtHead(item: T) {
+  prepend(item: T) {
     if (this.head === null) {
       this.head = new Node(item);
     } else {
@@ -40,7 +40,7 @@ export class LinkedList<T> implements TLinkedList<T> {
     this.size++;
   }
 
-  appendAtTail(item: T) {
+  append(item: T) {
     const node = new Node(item);
 
     if (this.head === null) {
@@ -58,7 +58,7 @@ export class LinkedList<T> implements TLinkedList<T> {
     this.size++;
   }
 
-  insertAt(item: T, index: number) {
+  addByIndex(item: T, index: number) {
     if (index < 0 || index > this.size) {
       return;
     } else {
@@ -93,7 +93,7 @@ export class LinkedList<T> implements TLinkedList<T> {
     }
   }
 
-  removeFromHead() {
+  deleteHead() {
     if (this.head !== null) {
       if (this.head.next === null) {
         this.head = null;
@@ -105,7 +105,7 @@ export class LinkedList<T> implements TLinkedList<T> {
     }
   }
 
-  removeFromTail() {
+  deleteTail() {
     if (this.head !== null) {
       if (this.head.next === null) {
         this.head = null;
@@ -123,7 +123,7 @@ export class LinkedList<T> implements TLinkedList<T> {
     }
   }
 
-  removeFrom(index: number) {
+  deleteByIndex(index: number) {
     if (index < 0 || index > this.size) {
       return;
     } else {
@@ -162,7 +162,7 @@ export class LinkedList<T> implements TLinkedList<T> {
     return this.size;
   }
 
-  transformListToArr() {
+  toArray() {
     const arr = [];
     let current = this.head;
 
@@ -174,8 +174,8 @@ export class LinkedList<T> implements TLinkedList<T> {
     return [...arr];
   }
 
-  getArr() {
-    return this.transformListToArr().map((item) => ({
+  getArray() {
+    return this.toArray().map((item) => ({
       value: item,
       state: ElementStates.Default,
     }));
