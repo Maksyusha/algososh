@@ -60,11 +60,11 @@ export const ListPage: FC = () => {
   };
 
   const handleAppendAtHeadButton = async () => {
-    const element = getElement(inputValues.string);
-
     setIsUiDisabled(true);
     setListStates({ ...listStates, isAppendingAtHead: true });
     await sleep(DELAY_IN_MS);
+
+    const element = getElement(inputValues.string);
 
     setListStates({ ...listStates, isAppendingAtHead: false });
     list.appendAtHead(inputValues.string);
@@ -77,15 +77,17 @@ export const ListPage: FC = () => {
 
     setListElements(list.getArr());
 
+    setInputValues({ ...inputValues, string: "" });
     setIsUiDisabled(false);
   };
 
   const handleAppendAtTailButton = async () => {
-    const element = getElement(inputValues.string);
-
     setIsUiDisabled(true);
     setListStates({ ...listStates, isAppendingAtTail: true });
+
     await sleep(DELAY_IN_MS);
+
+    const element = getElement(inputValues.string);
 
     setListStates({ ...listStates, isAppendingAtTail: false });
     list.appendAtTail(inputValues.string);
@@ -98,13 +100,14 @@ export const ListPage: FC = () => {
 
     setListElements(list.getArr());
 
+    setInputValues({ ...inputValues, string: "" });
     setIsUiDisabled(false);
   };
 
   const handleRemoveFromHeadButton = async () => {
     setListStates({ ...listStates, isRemovingFromHead: true });
-
     setIsUiDisabled(true);
+
     setRemovingValue(listElements[0].value);
     listElements[0].value = "";
     await sleep(DELAY_IN_MS);
@@ -119,8 +122,8 @@ export const ListPage: FC = () => {
 
   const handleRemoveFromTailButton = async () => {
     setListStates({ ...listStates, isRemovingFromTail: true });
-
     setIsUiDisabled(true);
+
     setRemovingValue(listElements[listElements.length - 1].value);
     listElements[listElements.length - 1].value = "";
     await sleep(DELAY_IN_MS);
@@ -135,7 +138,6 @@ export const ListPage: FC = () => {
 
   const handleInsertAtButton = async () => {
     setListStates({ ...listStates, isInsertingAt: true });
-
     setIsUiDisabled(true);
 
     const index = +inputValues.index;
@@ -152,12 +154,10 @@ export const ListPage: FC = () => {
         state: ElementStates.Changing,
       };
       setListElements([...changingArr]);
-      await sleep(SHORT_DELAY_IN_MS);
+      await sleep(DELAY_IN_MS);
     }
 
     list.insertAt(inputValues.string, index);
-
-    await sleep(SHORT_DELAY_IN_MS);
     setChangingIndex(null);
 
     changingArr.splice(index, 0, {
@@ -170,13 +170,12 @@ export const ListPage: FC = () => {
     setListElements(list.getArr());
 
     setListStates({ ...listStates, isInsertingAt: false });
-
+    setInputValues({ string: "", index: "" });
     setIsUiDisabled(false);
   };
 
   const handleRemoveFromButton = async () => {
-    setListStates({ ...listStates, isInsertingAt: true });
-
+    setListStates({ ...listStates, isRemovingFrom: true });
     setIsUiDisabled(true);
 
     const index = +inputValues.index;
@@ -184,25 +183,25 @@ export const ListPage: FC = () => {
 
     for (let i = 0; i <= index; i++) {
       changingArr[i] = {
-        value: changingArr[i].value,
+        ...changingArr[i],
         state: ElementStates.Changing,
       };
       setListElements([...changingArr]);
-      await sleep(SHORT_DELAY_IN_MS);
+      await sleep(DELAY_IN_MS);
     }
 
     setRemovingValue(changingArr[index].value);
+    setChangingIndex(index);
     changingArr[index] = { value: "", state: ElementStates.Default };
     setListElements([...changingArr]);
-    setChangingIndex(index);
-    await sleep(SHORT_DELAY_IN_MS);
+    await sleep(DELAY_IN_MS);
 
     setChangingIndex(null);
     list.removeFrom(index);
     setListElements(list.getArr());
 
-    setListStates({ ...listStates, isInsertingAt: false });
-
+    setListStates({ ...listStates, isRemovingFrom: false });
+    setInputValues({ ...inputValues, index: "" });
     setIsUiDisabled(false);
   };
 
@@ -244,6 +243,7 @@ export const ListPage: FC = () => {
       );
     }
     if (listStates.isInsertingAt && index === changingIndex) {
+      console.log('1')
       return (
         <Circle
           isSmall={true}
@@ -264,7 +264,6 @@ export const ListPage: FC = () => {
     if (!listStates.isAppendingAtHead && index === 0) {
       return "head";
     }
-
     return null;
   };
 
