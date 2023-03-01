@@ -9,6 +9,9 @@ import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { sleep } from "../../utils/sleep";
 import { getFibonacciNumbers } from "./fibonacci-page.utils";
 
+const MIN_FIBONACCI_VALUE = 1
+const MAX_FIBONACCI_VALUE = 19
+
 export const FibonacciPage: FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [fibonacciNumbers, setFibonacciNumbers] = useState<number[]>([]);
@@ -31,7 +34,7 @@ export const FibonacciPage: FC = () => {
   const handleInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const value = evt.currentTarget.value;
 
-    if (+value >= 1 && +value <= 19) {
+    if (+value >= MIN_FIBONACCI_VALUE && +value <= MAX_FIBONACCI_VALUE) {
       setInputValue(value);
       setIsDisabled(false);
     } else {
@@ -51,8 +54,8 @@ export const FibonacciPage: FC = () => {
             placeholder="Введите число"
             type={"number"}
             isLimitText={true}
-            min={"1"}
-            max={"19"}
+            min={String(MIN_FIBONACCI_VALUE)}
+            max={String(MAX_FIBONACCI_VALUE)}
             onChange={handleInputChange}
           />
           <Button

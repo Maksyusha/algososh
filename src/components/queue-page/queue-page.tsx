@@ -5,32 +5,28 @@ import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { ElementStates } from "../../types/element-states";
-import { Queue } from "./queue-page.utils";
+import { getEmptyQueueElements, Queue } from "./queue-page.utils";
 import { sleep } from "../../utils/sleep";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { HEAD, TAIL } from "../../constants/element-captions";
+import { QUEUE_LENGTH, MAX_INPUT_VALUE_LENGTH } from "../../constants/data-structures";
 
 type TQueueElement = {
   value: string;
   state: ElementStates;
 };
 
-const getEmptyQueueElements = (size: number) => {
-  return Array.from(
-    { length: size },
-    (): TQueueElement => ({
-      value: "",
-      state: ElementStates.Default,
-    })
-  );
-};
-
 export const QueuePage: FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [queueElements, setQueueElements] = useState<TQueueElement[]>(
-    getEmptyQueueElements(7)
+    getEmptyQueueElements<TQueueElement>(QUEUE_LENGTH, {value: '', state: ElementStates.Default})
   );
+  const [queueStates, setQueueState] = useState({
+    isAdding: false,
+    isDeleting: false,
+  });
   const [areButtonsDisabled, setAreButtonsDisabled] = useState(false);
-  const [queue] = useState(new Queue<TQueueElement>(7));
+  const [queue] = useState(new Queue<TQueueElement>(QUEUE_LENGTH));
 
   const handleInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setInputValue(evt.currentTarget.value);
@@ -41,10 +37,11 @@ export const QueuePage: FC = () => {
       return;
     }
 
-    if (queue.getTail() === 7) {
+    if (queue.getTail() === QUEUE_LENGTH) {
       return;
     }
 
+    setQueueState({ ...queueStates, isAdding: true });
     setAreButtonsDisabled(true);
     setInputValue("");
 
@@ -70,6 +67,7 @@ export const QueuePage: FC = () => {
     };
     setQueueElements([...queueElements]);
 
+    setQueueState({ ...queueStates, isAdding: false });
     setAreButtonsDisabled(false);
   };
 
@@ -78,6 +76,7 @@ export const QueuePage: FC = () => {
       return;
     }
 
+    setQueueState({ ...queueStates, isDeleting: true });
     setAreButtonsDisabled(true);
 
     queueElements[queue.getHead()] = {
@@ -95,6 +94,7 @@ export const QueuePage: FC = () => {
     };
     setQueueElements([...queueElements]);
 
+    setQueueState({ ...queueStates, isDeleting: false });
     setAreButtonsDisabled(false);
   };
 
@@ -106,7 +106,7 @@ export const QueuePage: FC = () => {
     setAreButtonsDisabled(true);
 
     queue.clear();
-    setQueueElements(getEmptyQueueElements(7));
+    setQueueElements(getEmptyQueueElements<TQueueElement>(QUEUE_LENGTH, {value: '', state: ElementStates.Default}));
 
     setAreButtonsDisabled(false);
   };
@@ -117,25 +117,28 @@ export const QueuePage: FC = () => {
         <div className={styles["ui-container"]}>
           <Input
             isLimitText={true}
-            maxLength={4}
+            maxLength={MAX_INPUT_VALUE_LENGTH}
             value={inputValue}
+            disabled={queueStates.isAdding || queueStates.isDeleting}
             onChange={handleInputChange}
           />
           <div className={styles["buttons-container"]}>
             <Button
               text="Добавить"
-              disabled={!inputValue}
+              isLoader={queueStates.isAdding}
+              disabled={!inputValue || queueStates.isDeleting}
               onClick={handleAddButtonClick}
             />
             <Button
               text="Удалить"
-              disabled={queue.isEmpty()}
+              isLoader={queueStates.isDeleting}
+              disabled={queue.isEmpty() || queueStates.isAdding}
               onClick={handleDeleteButtonClick}
             />
           </div>
           <Button
             text="Очистить"
-            disabled={!queueElements.length}
+            disabled={(queue.getHead() === 0 && queue.isEmpty()) || queueStates.isAdding || queueStates.isDeleting}
             onClick={handleClearButtonClick}
           />
         </div>
@@ -151,14 +154,14 @@ export const QueuePage: FC = () => {
                     }
                     head={
                       (queue.getHead() === index && !queue.isEmpty()) ||
-                      (queue.getHead() === 7 && index === 6) ||
+                      (queue.getHead() === QUEUE_LENGTH && index === QUEUE_LENGTH - 1) ||
                       (queue.getHead() === index && index !== 0)
-                        ? "head"
+                        ? HEAD
                         : null
                     }
                     tail={
                       queue.getTail() - 1 === index && !queue.isEmpty()
-                        ? "tail"
+                        ? TAIL
                         : null
                     }
                   />

@@ -8,6 +8,7 @@ import { Stack } from "./stack-page.utils";
 import { ElementStates } from "../../types/element-states";
 import { sleep } from "../../utils/sleep";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { MAX_INPUT_VALUE_LENGTH } from "../../constants/data-structures";
 
 type TStackElements = {
   value: string;
@@ -17,35 +18,47 @@ type TStackElements = {
 export const StackPage: FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [stackElements, setStackElements] = useState<TStackElements[]>([]);
-  const [stack] = useState(new Stack<TStackElements>())
+  const [stack] = useState(new Stack<TStackElements>());
+  const [stackStates, setStackStates] = useState({
+    isAdding: false,
+    isDeleting: false,
+  });
 
   const handleInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setInputValue(evt.currentTarget.value);
   };
 
   const handleAddButtonClick = async () => {
+    setStackStates({ ...stackStates, isAdding: true });
+
     stack.push({ value: inputValue, state: ElementStates.Changing });
-    const items = stack.getItems()
+    const items = stack.getItems();
     setStackElements([...items]);
     setInputValue("");
-    await sleep(SHORT_DELAY_IN_MS)
-    items[items.length - 1].state = ElementStates.Default
-    setStackElements(stack.getItems())
+    await sleep(SHORT_DELAY_IN_MS);
+    items[items.length - 1].state = ElementStates.Default;
+    setStackElements(stack.getItems());
+
+    setStackStates({ ...stackStates, isAdding: false });
   };
 
   const handleDeleteButtonClick = async () => {
-    const items = stack.getItems()
-    items[items.length - 1].state = ElementStates.Changing
+    setStackStates({ ...stackStates, isDeleting: true });
+
+    const items = stack.getItems();
+    items[items.length - 1].state = ElementStates.Changing;
     setStackElements([...items]);
-    await sleep(SHORT_DELAY_IN_MS)
+    await sleep(SHORT_DELAY_IN_MS);
     stack.pop();
-    setStackElements(stack.getItems())
+    setStackElements(stack.getItems());
+
+    setStackStates({ ...stackStates, isDeleting: false });
   };
 
   const handleClearButtonClick = () => {
-    stack.clear()
-    setStackElements(stack.getItems())
-  }
+    stack.clear();
+    setStackElements(stack.getItems());
+  };
 
   return (
     <SolutionLayout title="Стек">
@@ -53,23 +66,34 @@ export const StackPage: FC = () => {
         <div className={styles["ui-container"]}>
           <Input
             isLimitText={true}
-            maxLength={4}
+            maxLength={MAX_INPUT_VALUE_LENGTH}
             value={inputValue}
+            disabled={stackStates.isAdding || stackStates.isDeleting}
             onChange={handleInputChange}
           />
           <div className={styles["buttons-container"]}>
             <Button
               text="Добавить"
-              disabled={!inputValue}
+              isLoader={stackStates.isAdding}
+              disabled={
+                !inputValue ||
+                (!inputValue && !stackElements.length) ||
+                stackStates.isDeleting
+              }
               onClick={handleAddButtonClick}
             />
             <Button
               text="Удалить"
-              disabled={!stackElements.length}
+              isLoader={stackStates.isDeleting}
+              disabled={!stackElements.length || stackStates.isAdding}
               onClick={handleDeleteButtonClick}
             />
           </div>
-          <Button text="Очистить" disabled={!stackElements.length} onClick={handleClearButtonClick}/>
+          <Button
+            text="Очистить"
+            disabled={!stackElements.length || stackStates.isAdding || stackStates.isDeleting}
+            onClick={handleClearButtonClick}
+          />
         </div>
         <ul className={styles["circles-list"]}>
           {stackElements.map((element, index) => {

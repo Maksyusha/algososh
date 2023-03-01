@@ -1,3 +1,7 @@
+export const getEmptyQueueElements = <T>(size: number, values: T) => {
+  return Array.from({ length: size }, () => values);
+};
+
 type TQueue<T> = {
   isEmpty: () => boolean;
   enqueue: (item: T) => void;
@@ -58,8 +62,8 @@ export class Queue<T> implements TQueue<T> {
 
   clear() {
     this.container = Array(this.size);
-    this.head = 0
-    this.tail = 0
-    this.length = 0
+    this.head = 0;
+    this.tail = 0;
+    this.length = 0;
   }
 }

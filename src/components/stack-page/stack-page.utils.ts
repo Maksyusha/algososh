@@ -5,6 +5,8 @@ type TStack<T> = {
   getItems: () => T[];
 };
 
+
+
 export class Stack<T> implements TStack<T> {
   private container: T[] = [];
 

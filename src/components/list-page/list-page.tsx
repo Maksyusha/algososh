@@ -10,6 +10,14 @@ import { ArrowIcon } from "../ui/icons/arrow-icon";
 import { getRandomInteger } from "../sorting-page/sorting-page.utils";
 import { sleep } from "../../utils/sleep";
 import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { HEAD, TAIL } from "../../constants/element-captions";
+import {
+  MAX_INPUT_VALUE_LENGTH,
+  MAX_LIST_LENGTH,
+  MAX_LIST_VALUE,
+  MIN_LIST_LENGTH,
+  MIN_LIST_VALUE,
+} from "../../constants/data-structures";
 
 type TLinkedListItem = {
   value: string;
@@ -224,6 +232,22 @@ export const ListPage: FC = () => {
         />
       );
     }
+    if (listStates.isAddingByIndex && index === changingIndex) {
+      return (
+        <Circle
+          isSmall={true}
+          letter={inputValues.string}
+          state={ElementStates.Changing}
+        />
+      );
+    }
+    if (!listStates.isPrepending && index === 0) {
+      return HEAD;
+    }
+    return null;
+  };
+
+  const getCircleTail = (index: number) => {
     if (listStates.isDeletingHead && index === 0) {
       return (
         <Circle
@@ -242,16 +266,6 @@ export const ListPage: FC = () => {
         />
       );
     }
-    if (listStates.isAddingByIndex && index === changingIndex) {
-      console.log('1')
-      return (
-        <Circle
-          isSmall={true}
-          letter={inputValues.string}
-          state={ElementStates.Changing}
-        />
-      );
-    }
     if (listStates.isDeletingByIndex && index === changingIndex) {
       return (
         <Circle
@@ -261,15 +275,16 @@ export const ListPage: FC = () => {
         />
       );
     }
-    if (!listStates.isPrepending && index === 0) {
-      return "head";
+    if (index === list.getSize() - 1) {
+      return TAIL;
     }
     return null;
   };
 
   useEffect(() => {
-    const elements = Array.from({ length: getRandomInteger(2, 6) }, () =>
-      String(getRandomInteger(0, 100))
+    const elements = Array.from(
+      { length: getRandomInteger(MIN_LIST_LENGTH, MAX_LIST_LENGTH) },
+      () => String(getRandomInteger(MIN_LIST_VALUE, MAX_LIST_VALUE))
     );
 
     for (let element of elements) {
@@ -288,7 +303,7 @@ export const ListPage: FC = () => {
               name="string"
               placeholder="Введите значение"
               isLimitText={true}
-              maxLength={4}
+              maxLength={MAX_INPUT_VALUE_LENGTH}
               value={inputValues.string}
               onChange={handleInputChange}
               disabled={isUiDisabled}
@@ -302,7 +317,7 @@ export const ListPage: FC = () => {
                 disabled={
                   !inputValues.string ||
                   (!listStates.isPrepending && isUiDisabled) ||
-                  listElements.length > 5
+                  listElements.length >= MAX_LIST_LENGTH
                 }
               />
               <Button
@@ -313,7 +328,7 @@ export const ListPage: FC = () => {
                 disabled={
                   !inputValues.string ||
                   (!listStates.isAppending && isUiDisabled) ||
-                  listElements.length > 5
+                  listElements.length >= MAX_LIST_LENGTH
                 }
               />
               <Button
@@ -359,7 +374,7 @@ export const ListPage: FC = () => {
                   !inputValues.string ||
                   !inputValues.index ||
                   (!listStates.isAddingByIndex && isUiDisabled) ||
-                  listElements.length > 5
+                  listElements.length >= MAX_LIST_LENGTH
                 }
               />
               <Button
@@ -385,7 +400,7 @@ export const ListPage: FC = () => {
                   state={element.state}
                   index={index}
                   head={getCircleHead(index)}
-                  tail={index === list.getSize() - 1 ? "tail" : null}
+                  tail={getCircleTail(index)}
                 />
                 {index !== list.getSize() - 1 ? (
                   <div className={styles["arrow"]}>
