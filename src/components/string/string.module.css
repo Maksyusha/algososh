@@ -1,0 +1,15 @@
+.input-container {
+  max-width: 522px;
+  margin: 0 auto;
+  display: flex;
+  gap: 12px;
+}
+
+.circles-list {
+  padding: 0;
+  margin: 120px 0 0;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  list-style: none;
+}
