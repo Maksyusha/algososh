@@ -5,47 +5,32 @@ import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { ElementStates } from "../../types/element-states";
 import { Circle } from "../ui/circle/circle";
-import { swap } from "../../utils/swap";
 import { sleep } from "../../utils/sleep";
 import { DELAY_IN_MS } from "../../constants/delays";
-
-type TStringElement = {
-  value: string;
-  state: ElementStates;
-};
+import { reverseString } from "./string.utils";
+import { TStringElement } from "./string.utils";
 
 export const StringComponent: FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [stringElements, setStringElements] = useState<TStringElement[]>([]);
   const [isLoader, setIsLoader] = useState(false);
 
-  const reverseString = async (
-    arr: TStringElement[]
-  ) => {
+  const reverseStringWithDelay = async () => {
     setIsLoader(true);
-  
-    let start = 0;
-    let end = arr.length - 1;
-  
-    while (start <= end) {
-      arr[start].state = ElementStates.Changing;
-      arr[end].state = ElementStates.Changing;
-  
-      setStringElements([...arr]);
-  
-      await sleep(DELAY_IN_MS);
-  
-      arr[start].state = ElementStates.Modified;
-      arr[end].state = ElementStates.Modified;
-  
-      swap(arr, start, end);
-  
-      setStringElements([...arr]);
-  
-      start++;
-      end--;
+
+    const elementsArr: TStringElement[] = inputValue
+      .split("")
+      .map((letter) => ({ value: letter, state: ElementStates.Default }));
+
+    const gen = reverseString(elementsArr)
+    let next = gen.next()
+
+    while (!next.done) {
+      setStringElements(next.value.slice())
+      await sleep(DELAY_IN_MS)
+      next = gen.next()
     }
-  
+
     setIsLoader(false);
   };
 
@@ -54,13 +39,7 @@ export const StringComponent: FC = () => {
   };
 
   const handleButtonClick = () => {
-    const elements: TStringElement[] = inputValue.split("").map((value) => {
-      return {
-        value,
-        state: ElementStates.Default,
-      };
-    });
-    reverseString(elements);
+    reverseStringWithDelay();
   };
 
   return (
@@ -74,6 +53,7 @@ export const StringComponent: FC = () => {
             onChange={handleInputChange}
           />
           <Button
+            type="button"
             text="Развернуть"
             isLoader={isLoader}
             disabled={inputValue === ""}
