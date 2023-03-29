@@ -22,13 +22,13 @@ export const StringComponent: FC = () => {
       .split("")
       .map((letter) => ({ value: letter, state: ElementStates.Default }));
 
-    const gen = reverseString(elementsArr)
-    let next = gen.next()
+    const gen = reverseString(elementsArr);
+    let next = gen.next();
 
     while (!next.done) {
-      setStringElements(next.value.slice())
-      await sleep(DELAY_IN_MS)
-      next = gen.next()
+      setStringElements(next.value.slice());
+      await sleep(DELAY_IN_MS);
+      next = gen.next();
     }
 
     setIsLoader(false);
@@ -53,6 +53,7 @@ export const StringComponent: FC = () => {
             onChange={handleInputChange}
           />
           <Button
+            data-testid="buttonReverse"
             type="button"
             text="Развернуть"
             isLoader={isLoader}

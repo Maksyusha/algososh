@@ -73,6 +73,7 @@ export const StackPage: FC = () => {
           />
           <div className={styles["buttons-container"]}>
             <Button
+              data-testid="buttonAdd"
               text="Добавить"
               isLoader={stackStates.isAdding}
               disabled={
@@ -83,6 +84,7 @@ export const StackPage: FC = () => {
               onClick={handleAddButtonClick}
             />
             <Button
+              data-testid="buttonDelete"
               text="Удалить"
               isLoader={stackStates.isDeleting}
               disabled={!stackElements.length || stackStates.isAdding}
@@ -90,8 +92,13 @@ export const StackPage: FC = () => {
             />
           </div>
           <Button
+            data-testid="buttonClear"
             text="Очистить"
-            disabled={!stackElements.length || stackStates.isAdding || stackStates.isDeleting}
+            disabled={
+              !stackElements.length ||
+              stackStates.isAdding ||
+              stackStates.isDeleting
+            }
             onClick={handleClearButtonClick}
           />
         </div>
