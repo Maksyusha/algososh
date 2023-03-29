@@ -2,7 +2,7 @@ import renderer from "react-test-renderer";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Button } from "./button";
 
-describe("button component", () => {
+describe("Button component", () => {
   it("renders with text", () => {
     const tree = renderer.create(<Button text="test"></Button>).toJSON();
 
@@ -27,7 +27,7 @@ describe("button component", () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it("callback", () => {
+  it("works with callback callback after button was clicked", () => {
     const callback = jest.fn();
     render(<Button onClick={callback}></Button>);
 

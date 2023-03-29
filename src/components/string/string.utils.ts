@@ -6,6 +6,7 @@ export type TStringElement = {
   state: ElementStates;
 };
 
+// Переписал функцию разворота строки на генератор, чтобы убрать логику компонента
 export function* reverseString(arr: TStringElement[] ) {
   let start = 0;
   let end = arr.length - 1;

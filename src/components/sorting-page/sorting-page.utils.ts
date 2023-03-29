@@ -32,6 +32,7 @@ export const getRandomColumns = () => {
   return randomColumns;
 };
 
+// Переписал функцию сортировки на генератор, чтобы убрать логику компонента
 export function* sortBySelection(arr: TColumn[], sortingDirection: Direction) {
   if (!arr.length) {
     return arr;

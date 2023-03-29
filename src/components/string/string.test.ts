@@ -1,6 +1,7 @@
 import { ElementStates } from "../../types/element-states";
 import { reverseString } from "./string.utils";
 
+// функция прогона генератора реверсирования строки
 const getReversedString = (str: string) => {
   const arr = str
     .split("")

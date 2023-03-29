@@ -7,6 +7,7 @@ import {
 } from "./sorting-page.utils";
 import { Direction } from "../../types/direction";
 
+// функция прогона генератора сортировка
 const getSortedNumber = (
   arr: TColumn[],
   sortingType: ESortingType,
@@ -18,8 +19,8 @@ const getSortedNumber = (
         ? sortBySelection(arr, Direction.Ascending)
         : sortBySelection(arr, Direction.Descending)
       : sortingDirection === Direction.Ascending
-      ? sortByBubble(arr, Direction.Ascending)
-      : sortByBubble(arr, Direction.Descending);
+        ? sortByBubble(arr, Direction.Ascending)
+        : sortByBubble(arr, Direction.Descending);
 
   let next = gen.next();
   while (!next.done) {
