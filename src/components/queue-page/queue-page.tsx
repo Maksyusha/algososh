@@ -9,7 +9,10 @@ import { getEmptyQueueElements, Queue } from "./queue-page.utils";
 import { sleep } from "../../utils/sleep";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { HEAD, TAIL } from "../../constants/element-captions";
-import { QUEUE_LENGTH, MAX_INPUT_VALUE_LENGTH } from "../../constants/data-structures";
+import {
+  QUEUE_LENGTH,
+  MAX_INPUT_VALUE_LENGTH,
+} from "../../constants/data-structures";
 
 type TQueueElement = {
   value: string;
@@ -19,7 +22,10 @@ type TQueueElement = {
 export const QueuePage: FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [queueElements, setQueueElements] = useState<TQueueElement[]>(
-    getEmptyQueueElements<TQueueElement>(QUEUE_LENGTH, {value: '', state: ElementStates.Default})
+    getEmptyQueueElements<TQueueElement>(QUEUE_LENGTH, {
+      value: "",
+      state: ElementStates.Default,
+    })
   );
   const [queueStates, setQueueState] = useState({
     isAdding: false,
@@ -106,7 +112,12 @@ export const QueuePage: FC = () => {
     setAreButtonsDisabled(true);
 
     queue.clear();
-    setQueueElements(getEmptyQueueElements<TQueueElement>(QUEUE_LENGTH, {value: '', state: ElementStates.Default}));
+    setQueueElements(
+      getEmptyQueueElements<TQueueElement>(QUEUE_LENGTH, {
+        value: "",
+        state: ElementStates.Default,
+      })
+    );
 
     setAreButtonsDisabled(false);
   };
@@ -124,12 +135,14 @@ export const QueuePage: FC = () => {
           />
           <div className={styles["buttons-container"]}>
             <Button
+              data-testid="buttonAdd"
               text="Добавить"
               isLoader={queueStates.isAdding}
               disabled={!inputValue || queueStates.isDeleting}
               onClick={handleAddButtonClick}
             />
             <Button
+              data-testid="buttonDelete"
               text="Удалить"
               isLoader={queueStates.isDeleting}
               disabled={queue.isEmpty() || queueStates.isAdding}
@@ -137,8 +150,13 @@ export const QueuePage: FC = () => {
             />
           </div>
           <Button
+            data-testid="buttonClear"
             text="Очистить"
-            disabled={(queue.getHead() === 0 && queue.isEmpty()) || queueStates.isAdding || queueStates.isDeleting}
+            disabled={
+              (queue.getHead() === 0 && queue.isEmpty()) ||
+              queueStates.isAdding ||
+              queueStates.isDeleting
+            }
             onClick={handleClearButtonClick}
           />
         </div>
@@ -154,7 +172,8 @@ export const QueuePage: FC = () => {
                     }
                     head={
                       (queue.getHead() === index && !queue.isEmpty()) ||
-                      (queue.getHead() === QUEUE_LENGTH && index === QUEUE_LENGTH - 1) ||
+                      (queue.getHead() === QUEUE_LENGTH &&
+                        index === QUEUE_LENGTH - 1) ||
                       (queue.getHead() === index && index !== 0)
                         ? HEAD
                         : null

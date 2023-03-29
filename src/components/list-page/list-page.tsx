@@ -12,10 +12,10 @@ import { sleep } from "../../utils/sleep";
 import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { HEAD, TAIL } from "../../constants/element-captions";
 import {
+  DEFAULT_LIST_LENGTH,
   MAX_INPUT_VALUE_LENGTH,
   MAX_LIST_LENGTH,
   MAX_LIST_VALUE,
-  MIN_LIST_LENGTH,
   MIN_LIST_VALUE,
 } from "../../constants/data-structures";
 
@@ -283,7 +283,7 @@ export const ListPage: FC = () => {
 
   useEffect(() => {
     const elements = Array.from(
-      { length: getRandomInteger(MIN_LIST_LENGTH, MAX_LIST_LENGTH) },
+      { length: DEFAULT_LIST_LENGTH },
       () => String(getRandomInteger(MIN_LIST_VALUE, MAX_LIST_VALUE))
     );
 
@@ -300,6 +300,7 @@ export const ListPage: FC = () => {
         <ul className={styles["ui-list"]}>
           <li className={styles["ui-list-item"]}>
             <Input
+              data-testid="inputValue"
               name="string"
               placeholder="Введите значение"
               isLimitText={true}
@@ -310,6 +311,7 @@ export const ListPage: FC = () => {
             />
             <div className={styles["buttons-container"]}>
               <Button
+                data-testid="buttonPrepend"
                 linkedList="small"
                 text="Добавить в head"
                 onClick={handlePrependButton}
@@ -321,6 +323,7 @@ export const ListPage: FC = () => {
                 }
               />
               <Button
+                data-testid="buttonAppend"
                 linkedList="small"
                 text="Добавить в tail"
                 onClick={handleAppendButton}
@@ -332,6 +335,7 @@ export const ListPage: FC = () => {
                 }
               />
               <Button
+                data-testid="buttonDeleteHead"
                 linkedList="small"
                 text="Удалить из head"
                 onClick={handleDeleteHeadButton}
@@ -342,6 +346,7 @@ export const ListPage: FC = () => {
                 }
               />
               <Button
+                data-testid="buttonDeleteTail"
                 linkedList="small"
                 text="Удалить из tail"
                 onClick={handleDeleteTailButton}
@@ -355,6 +360,7 @@ export const ListPage: FC = () => {
           </li>
           <li className={styles["ui-list-item"]}>
             <Input
+              data-testid="inputIndex"
               name="index"
               type="number"
               min={0}
@@ -366,6 +372,7 @@ export const ListPage: FC = () => {
             />
             <div className={styles["buttons-container"]}>
               <Button
+                data-testid="buttonAddByIndex"
                 linkedList="big"
                 text="Добавить по индексу"
                 onClick={handleAddByIndexButton}
@@ -378,6 +385,7 @@ export const ListPage: FC = () => {
                 }
               />
               <Button
+                data-testid="buttonDeleteByIndex"
                 linkedList="big"
                 text="Удалить по индексу"
                 onClick={handleDeleteByIndexButton}
@@ -403,7 +411,7 @@ export const ListPage: FC = () => {
                   tail={getCircleTail(index)}
                 />
                 {index !== list.getSize() - 1 ? (
-                  <div className={styles["arrow"]}>
+                  <div data-testid="iconArrow" className={styles["arrow"]}>
                     <ArrowIcon />
                   </div>
                 ) : null}

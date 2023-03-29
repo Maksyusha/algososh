@@ -5,156 +5,74 @@ import { RadioInput } from "../ui/radio-input/radio-input";
 import { Button } from "../ui/button/button";
 import { Column } from "../ui/column/column";
 import { Direction } from "../../types/direction";
-import { ElementStates } from "../../types/element-states";
-import { getRandomColumns } from "./sorting-page.utils";
-import { swap } from "../../utils/swap";
+import {
+  ESortingType,
+  TColumn,
+  getRandomColumns,
+  sortBySelection,
+  sortByBubble,
+} from "./sorting-page.utils";
 import { sleep } from "../../utils/sleep";
 import { DELAY_IN_MS } from "../../constants/delays";
 
-enum SortType {
-  Selection = "selection",
-  Bubble = "bubble",
-}
-
-type TColumn = {
-  number: number;
-  state: ElementStates;
-};
-
 export const SortingPage: FC = () => {
   const [isLoader, setIsLoader] = useState(false);
-  const [sortType, setSortType] = useState(SortType.Selection);
-  const [sortDirection, setSortDirection] = useState<Direction>(
+  const [SortingType, setSortingType] = useState(ESortingType.Selection);
+  const [SortingDirection, setSortingDirection] = useState<Direction>(
     Direction.Ascending
   );
   const [randomColumns, setRandomColumns] = useState<TColumn[]>([]);
 
-  const sortBySelectionAscending = async () => {
+  const sortBySelectionWithDelay = async (SortingDirection: Direction) => {
     setIsLoader(true);
-    const arr = randomColumns.slice();
 
-    for (let i = 0; i < arr.length; i++) {
-      let minIndex = i;
+    const gen = sortBySelection(randomColumns.slice(), SortingDirection);
+    let next = gen.next();
 
-      for (let j = i; j < arr.length; j++) {
-        arr[j].state = ElementStates.Changing;
-        setRandomColumns([...arr]);
-        await sleep(DELAY_IN_MS);
-
-        if (arr[minIndex].number > arr[j].number) {
-          minIndex = j;
-        }
-
-        arr[j].state = ElementStates.Default;
-      }
-
-      swap(arr, i, minIndex);
-      arr[i].state = ElementStates.Modified;
-      setRandomColumns([...arr]);
+    while (!next.done) {
+      setRandomColumns(next.value.slice());
+      await sleep(DELAY_IN_MS);
+      next = gen.next();
     }
+
     setIsLoader(false);
   };
 
-  const sortBySelectionDescending = async () => {
+  const sortByBubbleWithDelay = async (SortingDirection: Direction) => {
     setIsLoader(true);
-    const arr = randomColumns.slice();
 
-    for (let i = 0; i < arr.length; i++) {
-      let maxIndex = i;
+    const gen = sortByBubble(randomColumns.slice(), SortingDirection);
+    let next = gen.next();
 
-      for (let j = i; j < arr.length; j++) {
-        arr[j].state = ElementStates.Changing;
-        setRandomColumns([...arr]);
-        await sleep(DELAY_IN_MS);
-
-        if (arr[maxIndex].number < arr[j].number) {
-          maxIndex = j;
-        }
-
-        arr[j].state = ElementStates.Default;
-      }
-
-      swap(arr, i, maxIndex);
-      arr[i].state = ElementStates.Modified;
-      setRandomColumns([...arr]);
+    while (!next.done) {
+      setRandomColumns(next.value.slice());
+      await sleep(DELAY_IN_MS);
+      next = gen.next();
     }
+
     setIsLoader(false);
   };
 
-  const sortByBubbleAscending = async () => {
-    setIsLoader(true);
-    const arr = [...randomColumns];
+  const sortElements = (SortingDirection: Direction) => {
+    setSortingDirection(SortingDirection);
 
-    for (let i = 0; i < arr.length; i++) {
-      for (let j = 0; j < arr.length - i - 1; j++) {
-        arr[j].state = ElementStates.Changing;
-        arr[j + 1].state = ElementStates.Changing;
-        setRandomColumns([...arr]);
-        await sleep(DELAY_IN_MS);
-
-        if (arr[j].number > arr[j + 1].number) {
-          swap(arr, j, j + 1);
-        }
-
-        arr[j].state = ElementStates.Default;
-      }
-      arr[arr.length - i - 1].state = ElementStates.Modified;
-      setRandomColumns([...arr]);
-    }
-    setIsLoader(false);
-  };
-
-  const sortByBubbleDescending = async () => {
-    setIsLoader(true);
-    const arr = [...randomColumns];
-
-    for (let i = 0; i < arr.length; i++) {
-      for (let j = 0; j < arr.length - i - 1; j++) {
-        arr[j].state = ElementStates.Changing;
-        arr[j + 1].state = ElementStates.Changing;
-        setRandomColumns([...arr]);
-        await sleep(DELAY_IN_MS);
-
-        if (arr[j].number < arr[j + 1].number) {
-          swap(arr, j, j + 1);
-        }
-
-        arr[j].state = ElementStates.Default;
-      }
-      arr[arr.length - i - 1].state = ElementStates.Modified;
-      setRandomColumns([...arr]);
-    }
-    setIsLoader(false);
-  };
-
-  const sortElements = (sortDirection: Direction) => {
-    setSortDirection(sortDirection);
-
-    if (sortType === SortType.Selection) {
-      if (sortDirection === Direction.Ascending) {
-        sortBySelectionAscending();
-      } else {
-        sortBySelectionDescending();
-      }
+    if (SortingType === ESortingType.Selection) {
+      sortBySelectionWithDelay(SortingDirection);
     } else {
-      if (sortDirection === Direction.Ascending) {
-        sortByBubbleAscending();
-      } else {
-        sortByBubbleDescending();
-      }
+      sortByBubbleWithDelay(SortingDirection);
     }
   };
 
   const handleRadioInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    if (evt.currentTarget.value === SortType.Selection) {
-      setSortType(SortType.Selection);
+    if (evt.currentTarget.value === ESortingType.Selection) {
+      setSortingType(ESortingType.Selection);
     } else {
-      setSortType(SortType.Bubble);
+      setSortingType(ESortingType.Bubble);
     }
   };
 
-  const handleSortButtonClick = (sortDirection: Direction) => {
-    sortElements(sortDirection);
+  const handleSortButtonClick = (SortingDirection: Direction) => {
+    sortElements(SortingDirection);
   };
 
   const handleNewArrButtonClick = () => {
@@ -170,15 +88,15 @@ export const SortingPage: FC = () => {
           <div className={styles["radio-inputs-container"]}>
             <RadioInput
               label="Выбор"
-              value={SortType.Selection}
-              checked={sortType === SortType.Selection ? true : false}
+              value={ESortingType.Selection}
+              checked={SortingType === ESortingType.Selection ? true : false}
               disabled={isLoader}
               onChange={handleRadioInputChange}
             />
             <RadioInput
               label="Пузырёк"
-              value={SortType.Bubble}
-              checked={sortType === SortType.Bubble ? true : false}
+              value={ESortingType.Bubble}
+              checked={SortingType === ESortingType.Bubble ? true : false}
               disabled={isLoader}
               onChange={handleRadioInputChange}
             />
@@ -189,10 +107,10 @@ export const SortingPage: FC = () => {
               text="По возрастанию"
               sorting={Direction.Ascending}
               isLoader={
-                sortDirection === Direction.Ascending && isLoader ? true : false
+                SortingDirection === Direction.Ascending && isLoader ? true : false
               }
               disabled={
-                (sortDirection === Direction.Ascending && isLoader) || !isLoader
+                (SortingDirection === Direction.Ascending && isLoader) || !isLoader
                   ? false
                   : true
               }
@@ -203,12 +121,12 @@ export const SortingPage: FC = () => {
               text="По убыванию"
               sorting={Direction.Descending}
               isLoader={
-                sortDirection === Direction.Descending && isLoader
+                SortingDirection === Direction.Descending && isLoader
                   ? true
                   : false
               }
               disabled={
-                (sortDirection === Direction.Descending && isLoader) ||
+                (SortingDirection === Direction.Descending && isLoader) ||
                 !isLoader
                   ? false
                   : true

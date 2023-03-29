@@ -9,8 +9,8 @@ import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { sleep } from "../../utils/sleep";
 import { getFibonacciNumbers } from "./fibonacci-page.utils";
 
-const MIN_FIBONACCI_VALUE = 1
-const MAX_FIBONACCI_VALUE = 19
+const MIN_FIBONACCI_VALUE = 1;
+const MAX_FIBONACCI_VALUE = 19;
 
 export const FibonacciPage: FC = () => {
   const [inputValue, setInputValue] = useState("");
@@ -59,6 +59,7 @@ export const FibonacciPage: FC = () => {
             onChange={handleInputChange}
           />
           <Button
+            data-testid="buttonCalculate"
             text="Рассчитать"
             isLoader={isLoader}
             disabled={isDisabled}
